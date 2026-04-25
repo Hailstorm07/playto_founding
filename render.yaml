@@ -2,9 +2,9 @@ services:
   # Backend
   - type: web
     name: playto-pay-backend
-    env: python
+    runtime: python
     buildCommand: "./render-build.sh"
-    startCommand: "gunicorn playto_pay.wsgi"
+    startCommand: "gunicorn playto_pay.wsgi:application"
     rootDir: backend
     envVars:
       - key: DATABASE_URL
