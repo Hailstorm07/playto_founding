@@ -19,18 +19,17 @@ services:
         value: "playto-pay-backend.onrender.com,playto-pay-frontend.onrender.com"
 
   # Frontend
-  - type: web
+  - type: static_site
     name: playto-pay-frontend
-    env: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromStack:
+        fromService:
           type: web
           name: playto-pay-backend
-          property: url
+          property: host
     routes:
       - type: rewrite
         source: /*
