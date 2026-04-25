@@ -27,10 +27,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: playto-pay-backend
-          property: url
+        value: https://playto-pay-backend.onrender.com
     routes:
       - type: rewrite
         source: /*
