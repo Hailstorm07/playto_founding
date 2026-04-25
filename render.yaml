@@ -19,8 +19,9 @@ services:
         value: "playto-pay-backend.onrender.com,playto-pay-frontend.onrender.com"
 
   # Frontend
-  - type: static_site
+  - type: web
     name: playto-pay-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
