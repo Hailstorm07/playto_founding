@@ -2,6 +2,8 @@
 # exit on error
 set -o errexit
 
+echo "===== Build Start ====="
+
 # Build frontend
 echo "Building frontend..."
 cd frontend
@@ -10,24 +12,30 @@ rm -rf node_modules package-lock.json
 npm install
 npm run build
 cd ..
+echo "✓ Frontend built"
 
 # Copy frontend build to backend static files
 echo "Copying frontend build to backend staticfiles..."
 mkdir -p backend/staticfiles/dist
 cp -r frontend/dist/* backend/staticfiles/dist/
+echo "✓ Frontend copied"
 
 # Build backend
-echo "Building backend..."
-# Install Python packages globally (not in a venv)
+echo "Installing Python dependencies..."
 python3 -m pip install --upgrade pip setuptools wheel
 python3 -m pip install -r backend/requirements.txt
+echo "✓ Dependencies installed"
 
 cd backend
 echo "Running collectstatic..."
 python3 manage.py collectstatic --no-input --clear
+echo "✓ Static files collected"
+
 echo "Running migrations..."
 python3 manage.py migrate
-cd ..
+echo "✓ Migrations applied"
 
-echo "Build complete!"
+cd ..
+echo "===== Build Complete ====="
+
 
