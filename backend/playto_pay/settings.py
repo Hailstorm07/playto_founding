@@ -25,9 +25,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-duag6_qo)4%7aos)m%@kb(ixi53^ql!k!*)q-!af6l5ql0w9*q')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]
+
+# Add Railway domain patterns
+if not DEBUG:
+    ALLOWED_HOSTS.append('*.railway.app')
+
+# Railway deployment settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 
 # Application definition
@@ -67,7 +81,17 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS Configuration
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    # In production, allow only from the same origin
+    CORS_ALLOWED_ORIGINS = [
+        "https://*.railway.app",
+        "http://localhost:3000",  # For local development
+        "http://127.0.0.1:3000",
+    ]
+    CORS_ALLOW_ALL_ORIGINS = False
 
 AUTH_USER_MODEL = 'kyc.User'
 

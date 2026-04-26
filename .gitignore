@@ -7,7 +7,6 @@ venv/
 db.sqlite3
 media/kyc_documents/*
 !media/kyc_documents/.gitkeep
-
 # Node
 node_modules/
 dist/
