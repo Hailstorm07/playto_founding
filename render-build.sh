@@ -5,6 +5,8 @@ set -o errexit
 # Build frontend
 echo "Building frontend..."
 cd frontend
+# Remove existing lockfile and node_modules to fix native binding issues
+rm -rf node_modules package-lock.json
 npm install
 npm run build
 cd ..
