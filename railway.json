@@ -6,6 +6,7 @@
   "deploy": {
     "startCommand": "gunicorn --pythonpath backend playto_pay.wsgi:application",
     "buildCommand": "chmod +x render-build.sh && ./render-build.sh",
+    "runtime": "python",
     "restartPolicyType": "ON_FAILURE",
     "healthCheckPath": "/api/v1/metrics/"
   }
