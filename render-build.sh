@@ -13,8 +13,10 @@ cd ..
 
 # Build backend
 echo "Building backend..."
-pip install -r backend/requirements.txt
+# Use python3 -m pip as it's more reliable in Linux environments
+python3 -m pip install --upgrade pip
+python3 -m pip install -r backend/requirements.txt
 
 cd backend
-python manage.py collectstatic --no-input
-python manage.py migrate
+python3 manage.py collectstatic --no-input
+python3 manage.py migrate
