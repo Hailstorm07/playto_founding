@@ -4,7 +4,7 @@
     "builder": "RAILPACK"
   },
   "deploy": {
-    "startCommand": "cd backend && gunicorn playto_pay.wsgi:application --bind 0.0.0.0:$PORT",
+    "startCommand": "cd backend && python3 -m gunicorn playto_pay.wsgi:application --bind 0.0.0.0:$PORT",
     "buildCommand": "bash render-build.sh",
     "restartPolicyType": "ON_FAILURE"
   }
