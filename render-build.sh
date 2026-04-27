@@ -11,14 +11,36 @@ cd frontend
 rm -rf node_modules package-lock.json
 npm install
 npm run build
+echo "✓ Frontend built to frontend/dist"
+
+# Verify frontend dist exists
+if [ ! -d "dist" ]; then
+    echo "✗ ERROR: frontend/dist directory not created!"
+    exit 1
+fi
+
 cd ..
-echo "✓ Frontend built"
+echo "✓ Frontend build complete"
 
 # Copy frontend build to backend static files
 echo "Copying frontend build to backend staticfiles..."
 mkdir -p backend/staticfiles/dist
+# Remove old dist folder if it exists
+rm -rf backend/staticfiles/dist/*
+# Copy new build
 cp -r frontend/dist/* backend/staticfiles/dist/
-echo "✓ Frontend copied"
+
+# Verify copy was successful
+if [ ! -f "backend/staticfiles/dist/index.html" ]; then
+    echo "✗ ERROR: index.html not copied to backend/staticfiles/dist!"
+    echo "Contents of frontend/dist:"
+    ls -la frontend/dist/
+    echo "Contents of backend/staticfiles/dist:"
+    ls -la backend/staticfiles/dist/
+    exit 1
+fi
+
+echo "✓ Frontend copied to backend/staticfiles/dist"
 
 # Build backend
 echo "Installing Python dependencies..."
@@ -37,5 +59,7 @@ echo "✓ Migrations applied"
 
 cd ..
 echo "===== Build Complete ====="
+echo "Deployment ready!"
+
 
 

@@ -23,10 +23,10 @@ def health_check(request):
 def serve_react_app(request):
     """Serve React app for any non-API route"""
     # Try to serve index.html from dist folder
+    # Check backend/staticfiles/dist first (where build script copies to)
     possible_paths = [
-        os.path.join(settings.STATIC_ROOT, 'dist', 'index.html'),
         os.path.join(settings.BASE_DIR, 'staticfiles', 'dist', 'index.html'),
-        os.path.join(settings.BASE_DIR, 'frontend', 'dist', 'index.html'),
+        os.path.join(settings.STATIC_ROOT, 'dist', 'index.html'),
     ]
     
     for file_path in possible_paths:
