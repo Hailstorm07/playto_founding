@@ -41,12 +41,15 @@ if not DEBUG:
 
 # Railway deployment settings
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Don't force SSL redirect - Railway handles HTTPS at the edge
+    # SECURE_SSL_REDIRECT = True  # Disabled to prevent redirect loops
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    # Trust Railway's proxy headers
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
