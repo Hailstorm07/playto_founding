@@ -47,23 +47,33 @@ cd ..
 
 # Copy frontend build to backend static files AFTER collectstatic
 # (so it doesn't get deleted by the --clear flag)
+# Copy directly to backend/staticfiles/ (not staticfiles/dist/) so paths match
 echo "Copying frontend build to backend staticfiles..."
-mkdir -p backend/staticfiles/dist
-# Copy the entire dist folder
-cp -r frontend/dist/* backend/staticfiles/dist/
+mkdir -p backend/staticfiles
+# Copy everything from frontend/dist to backend/staticfiles
+# This puts index.html and assets/ in the right place
+cp -r frontend/dist/* backend/staticfiles/
 
 # Verify copy was successful
-if [ ! -f "backend/staticfiles/dist/index.html" ]; then
-    echo "✗ ERROR: index.html not in backend/staticfiles/dist after copy!"
+if [ ! -f "backend/staticfiles/index.html" ]; then
+    echo "✗ ERROR: index.html not in backend/staticfiles after copy!"
     echo "Contents of frontend/dist:"
     ls -la frontend/dist/
-    echo "Contents of backend/staticfiles/dist:"
-    ls -la backend/staticfiles/dist/
+    echo "Contents of backend/staticfiles:"
+    ls -la backend/staticfiles/
     exit 1
 fi
 
-echo "✓ Frontend copied to backend/staticfiles/dist"
-echo "✓ index.html verified at: backend/staticfiles/dist/index.html"
+if [ ! -d "backend/staticfiles/assets" ]; then
+    echo "✗ ERROR: assets/ directory not found in backend/staticfiles!"
+    echo "Contents of backend/staticfiles:"
+    ls -la backend/staticfiles/
+    exit 1
+fi
+
+echo "✓ Frontend copied to backend/staticfiles"
+echo "✓ index.html verified at: backend/staticfiles/index.html"
+echo "✓ assets directory verified at: backend/staticfiles/assets"
 
 echo "===== Build Complete ====="
 echo "Deployment ready!"

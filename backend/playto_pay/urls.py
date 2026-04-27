@@ -22,11 +22,10 @@ def health_check(request):
 @cache_page(60 * 60)  # Cache for 1 hour
 def serve_react_app(request):
     """Serve React app for any non-API route"""
-    # Try to serve index.html from dist folder
-    # Check backend/staticfiles/dist first (where build script copies to)
+    # Try to serve index.html from staticfiles (where build script copies it)
     possible_paths = [
-        os.path.join(settings.BASE_DIR, 'staticfiles', 'dist', 'index.html'),
-        os.path.join(settings.STATIC_ROOT, 'dist', 'index.html'),
+        os.path.join(settings.BASE_DIR, 'staticfiles', 'index.html'),
+        os.path.join(settings.STATIC_ROOT, 'index.html'),
     ]
     
     for file_path in possible_paths:
@@ -58,7 +57,8 @@ if settings.DEBUG:
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Catch-all for React Router - must be last
+# Exclude: /api/, /admin/, /health/, /static/, /assets/, /media/
 if not settings.DEBUG:
     urlpatterns += [
-        re_path(r'^(?!api)(?!admin)(?!health)(?!static).*?/?$', serve_react_app, name='react_app'),
+        re_path(r'^(?!api)(?!admin)(?!health)(?!static)(?!assets)(?!media).*?/?$', serve_react_app, name='react_app'),
     ]
