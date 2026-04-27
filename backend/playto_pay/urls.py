@@ -2,10 +2,21 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import condition
+from django.views.decorators.csrf import csrf_exempt
 import os
+
+@csrf_exempt
+def health_check(request):
+    """Health check endpoint for debugging"""
+    return JsonResponse({
+        'status': 'ok',
+        'debug': settings.DEBUG,
+        'host': request.META.get('HTTP_HOST'),
+        'allowed_hosts': settings.ALLOWED_HOSTS,
+    })
 
 @condition(etag_func=None)
 @cache_page(60 * 60)  # Cache for 1 hour
@@ -15,6 +26,7 @@ def serve_react_app(request):
     possible_paths = [
         os.path.join(settings.STATIC_ROOT, 'dist', 'index.html'),
         os.path.join(settings.BASE_DIR, 'staticfiles', 'dist', 'index.html'),
+        os.path.join(settings.BASE_DIR, 'frontend', 'dist', 'index.html'),
     ]
     
     for file_path in possible_paths:
@@ -22,22 +34,31 @@ def serve_react_app(request):
             try:
                 response = FileResponse(open(file_path, 'rb'), content_type='text/html')
                 return response
-            except Exception:
+            except Exception as e:
                 continue
     
-    # If no index.html found, return 404
+    # If no index.html found, return debug info
     from django.http import HttpResponse
-    return HttpResponse("Frontend not built. Please run the build command.", status=404)
+    return HttpResponse(
+        f"Frontend not found at any of: {possible_paths}",
+        status=404,
+        content_type='text/plain'
+    )
 
 urlpatterns = [
+    path('health/', health_check, name='health'),
     path('admin/', admin.site.urls),
     path('api/v1/', include('kyc.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # Serve React frontend in production - catch all non-API routes
+
+# Serve static files with WhiteNoise in production
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Catch-all for React Router - must be last
+if not settings.DEBUG:
     urlpatterns += [
-        re_path(r'^(?!api)(?!admin)(?!static).*?/?$', serve_react_app, name='react_app'),
+        re_path(r'^(?!api)(?!admin)(?!health)(?!static).*?/?$', serve_react_app, name='react_app'),
     ]

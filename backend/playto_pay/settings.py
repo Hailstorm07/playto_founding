@@ -31,8 +31,13 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(','
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]
 
 # Add Railway domain patterns
+# Django wildcard syntax: .example.com matches *.example.com
 if not DEBUG:
-    ALLOWED_HOSTS.append('*.railway.app')
+    ALLOWED_HOSTS.extend([
+        '.up.railway.app',    # Matches any *.up.railway.app subdomain
+        '.railway.app',       # Matches any *.railway.app subdomain  
+        '.run.app',          # Matches any *.run.app subdomain
+    ])
 
 # Railway deployment settings
 if not DEBUG:
@@ -85,13 +90,16 @@ REST_FRAMEWORK = {
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    # In production, allow only from the same origin
-    CORS_ALLOWED_ORIGINS = [
-        "https://*.railway.app",
-        "http://localhost:3000",  # For local development
-        "http://127.0.0.1:3000",
-    ]
+    # In production, both frontend and backend are served from same origin
+    # So CORS is not needed, but we'll allow same-origin requests
     CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+    ]
+    # Allow any Railway domain
+    CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'kyc.User'
 
